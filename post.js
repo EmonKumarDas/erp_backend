@@ -37,6 +37,7 @@ const createBill = (BillCollection, app) => {
       // Add current date to the bill document
       const now = new Date();
       billLower.date = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+      billLower.month = `${now.getFullYear()}-${now.getMonth() + 1}`;
 
       const result = await BillCollection.insertOne(billLower);
       res.send(result);
@@ -116,5 +117,5 @@ const paybill = (PayCollection, app) => {
 
 
 
-module.exports = { addProducts, createBill, addCompany, addUser, paybill,addShop };
+module.exports = { addProducts, createBill, addCompany, addUser, paybill, addShop };
 

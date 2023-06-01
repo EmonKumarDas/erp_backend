@@ -39,5 +39,28 @@ const UpdateProduct = (app, ProductCollection, ObjectId) => {
         }
     });
 };
+// ------------------------**************---------------------------------------
+const UpdateProductbill = (app, BillCollection, ObjectId) => {
+    app.put('/UpdateProductbill/:id', async (req, res) => {
+        const id = req.params.id;
+        const newadvance = req.body.advance;
+        const newbalance = req.body.newbalance;
 
-module.exports = { UpdateProduct };
+        try {
+            const result = await BillCollection.updateOne(
+                { _id: new ObjectId(id) },
+                { $set: { advance: newadvance, newbalance: newbalance } }
+            );
+            if (result.modifiedCount === 1) {
+                res.send(result);
+            } else {
+                res.status(404).send(`Product with _id ${id} not found`);
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(500).send('Internal server error');
+        }
+    });
+};
+
+module.exports = { UpdateProduct, UpdateProductbill };

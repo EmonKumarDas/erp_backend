@@ -16,6 +16,15 @@ const getProductsByProductName = (app, ProuductCollection) => {
     })
 }
 
+const getProductsByProductNameAndWatt = (app, ProuductCollection) => {
+    app.get('/getProductsByProductNameAndWatt/:name/:watt', async (req, res) => {
+        const Pname = req.params.name;
+        const watt = req.params.watt;
+        const productName = await ProuductCollection.find({ productname: Pname, watt: watt }).sort({ createdAt: -1 }).limit(1).toArray();
+        res.send(productName);
+    })
+}
+
 const getBillsById = (app, ObjectId, BillCollection) => {
     app.get('/getbills/:id', async (req, res) => {
         const billId = req.params.id;
@@ -73,4 +82,20 @@ const getemploybille = (app, PayCollection) => {
     })
 }
 
-module.exports = { getProductsByBarCode, getemploybille, getBillsById, getProductsByProductName, getEmployee, getEmployDetails };
+const getBillByDate = (app, BillCollection) => {
+    app.get('/getbillbydate/:date', async (req, res) => {
+        const date = req.params.date;
+        const bill = await BillCollection.find({ month: date }).sort({ _id: -1 }).toArray();
+        res.send(bill)
+    })
+}
+
+const getProductByDate = (app, ProuductCollection) => {
+    app.get('/getproductbydate/:date', async (req, res) => {
+        const date = req.params.date;
+        const product = await ProuductCollection.find({ month: date }).sort({ _id: -1 }).toArray();
+        res.send(product)
+    })
+}
+
+module.exports = { getProductsByBarCode, getProductByDate, getemploybille, getProductsByProductNameAndWatt, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getBillByDate };
