@@ -103,8 +103,7 @@ const paybill = (PayCollection, app) => {
       // Add current date to the bill document
       const now = new Date();
       billLower.date = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-      billLower.month = now.getMonth() + 1;
-      billLower.year = now.getFullYear();
+      billLower.month = `${now.getFullYear()}-${now.getMonth() + 1}`
       const result = await PayCollection.insertOne(billLower);
       res.send(result);
     } catch (err) {

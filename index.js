@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken');
 const { addProducts, createBill, addCompany, addUser, paybill, addShop } = require('./post');
 const { getproducts, getBill, getCompany, getUsers, getShop } = require('./get');
 const { deleteProduct } = require('./Delete');
-const { getProductsByBarCode, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getemploybille, getProductsByProductNameAndWatt, getBillByDate, getProductByDate } = require('./getDataById');
+const { getProductsByBarCode, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getemploybille, getProductsByProductNameAndWatt, getBillByDate, getProductByDate, getEmployPaymentByDate } = require('./getDataById');
 const { UpdateProduct, UpdateProductbill } = require('./Update');
 
 app.use(cors());
@@ -46,6 +46,7 @@ async function run() {
         addUser(UserCollection, app)
         getUsers(UserCollection, app)
         paybill(PayCollection, app)
+        getEmployPaymentByDate(app, PayCollection)
         getEmployDetails(app, ObjectId, PayCollection)
         getemploybille(app, PayCollection)
         getEmployee(PayCollection, app)

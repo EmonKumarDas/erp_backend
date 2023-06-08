@@ -98,4 +98,12 @@ const getProductByDate = (app, ProuductCollection) => {
     })
 }
 
-module.exports = { getProductsByBarCode, getProductByDate, getemploybille, getProductsByProductNameAndWatt, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getBillByDate };
+const getEmployPaymentByDate = (app, PayCollection) => {
+    app.get('/getemploypaymentbydate/:date', async (req, res) => {
+        const date = req.params.date;
+        const payment = await PayCollection.find({ month: date }).sort({ _id: -1 }).toArray();
+        res.send(payment)
+    })
+}
+
+module.exports = { getProductsByBarCode, getEmployPaymentByDate, getProductByDate, getemploybille, getProductsByProductNameAndWatt, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getBillByDate };
