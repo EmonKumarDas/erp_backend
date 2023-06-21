@@ -39,7 +39,9 @@ const UpdateProduct = (app, ProductCollection, ObjectId) => {
         }
     });
 };
+
 // ------------------------**************---------------------------------------
+
 const UpdateProductbill = (app, BillCollection, ObjectId) => {
     app.put('/UpdateProductbill/:id', async (req, res) => {
         const id = req.params.id;
@@ -63,4 +65,30 @@ const UpdateProductbill = (app, BillCollection, ObjectId) => {
     });
 };
 
-module.exports = { UpdateProduct, UpdateProductbill };
+// ----------------------------*************************-------------------------
+const UpdateTotalProduct = (app, TotalProductCollection, ObjectId) => {
+    app.put('/UpdateProductQuantity/:id', async (req, res) => {
+        const id = req.params.id;
+        const newQuantity = req.body.quantity;
+
+        try {
+            const result = await TotalProductCollection.updateOne(
+                { _id: new ObjectId(id) },
+                { $set: { quantity: newQuantity } }
+            );
+            if (result.modifiedCount === 1) {
+                res.send(result);
+            } else {
+                res.status(404).send(`Product with _id ${id} not found`);
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(500).send('Internal server error');
+        }
+    });
+};
+
+// ----------------------------*************************-------------------------
+
+
+module.exports = { UpdateProduct, UpdateProductbill, UpdateTotalProduct };

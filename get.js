@@ -52,4 +52,25 @@ const getShop = (ShopCollection, app) => {
     })
 }
 
-module.exports = { getproducts, getBill, getCompany, getUsers,getShop };
+const getTotalProduct = (TotalProductCollection, app) => {
+    app.get('/getTotalProduct', async (req, res) => {
+        try {
+            const result = await TotalProductCollection.find({}).sort({ _id: -1 }).toArray();
+            res.send(result);
+        } catch (error) {
+            res.status(500).send('Error fetching data');
+        }
+    })
+}
+const getbillbyshop = (PayShopBillCollection, app) => {
+    app.get('/getbillbyshop', async (req, res) => {
+        try {
+            const result = await PayShopBillCollection.find({}).sort({ _id: -1 }).toArray();
+            res.send(result);
+        } catch (error) {
+            res.status(500).send('Error fetching data');
+        }
+    })
+}
+
+module.exports = { getproducts, getBill, getCompany, getUsers,getbillbyshop, getShop, getTotalProduct };

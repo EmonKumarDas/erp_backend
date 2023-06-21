@@ -19,6 +19,24 @@ const addProducts = (ProuductCollection, app) => {
     }
   });
 };
+// --------------********** add Product **************------------------------
+const totalProduct = (ProuductCollection, app) => {
+  app.post('/totalProduct', async (req, res) => {
+    try {
+      const category = req.body;
+      // Convert all properties of category to lowercase
+      const categoryLower = Object.keys(category).reduce((obj, key) => {
+        obj[key.toLowerCase()] = typeof category[key] === 'string' ? category[key].toLowerCase() : category[key];
+        return obj;
+      }, {});
+      const result = await ProuductCollection.insertOne(categoryLower);
+      res.send(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error inserting category into database');
+    }
+  });
+};
 
 
 const createBill = (BillCollection, app) => {
@@ -113,8 +131,35 @@ const paybill = (PayCollection, app) => {
   })
 }
 
+const payShopBill = (PayShopBillCollection, app) => {
+  app.post('/payshopbill', async (req, res) => {
+    try {
+      const paybill = req.body;
+      console.log(paybill)
+      const billLower = Object.keys(paybill).reduce((obj, key) => {
+        if (typeof paybill[key] === 'string') {
+          obj[key.toLowerCase()] = paybill[key].toLowerCase();
+        } else {
+          obj[key.toLowerCase()] = paybill[key];
+        }
+        return obj;
+      }, {});
+
+      // Add current date to the bill document
+      // const now = new Date();
+      // billLower.date = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+      // billLower.month = `${now.getFullYear()}-${now.getMonth() + 1}`
+      const result = await PayShopBillCollection.insertOne(billLower);
+      res.send(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error inserting bill into database');
+    }
+  })
+}
 
 
 
-module.exports = { addProducts, createBill, addCompany, addUser, paybill, addShop };
+
+module.exports = { addProducts, createBill, addCompany, payShopBill, addUser, paybill, totalProduct, addShop };
 
