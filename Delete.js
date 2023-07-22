@@ -6,4 +6,13 @@ const deleteProduct = (app, CategoryCollection, ObjectId) => {
         res.send(result);
     })
 }
-module.exports = { deleteProduct };
+
+const deleteshop = (app, ShopCollection, ObjectId) => {
+    app.delete('/deleteshop/:id', async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const result = await ShopCollection.deleteOne(filter);
+        res.send(result);
+    })
+}
+module.exports = { deleteProduct, deleteshop };

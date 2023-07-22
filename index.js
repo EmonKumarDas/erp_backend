@@ -9,11 +9,11 @@ const ObjectId = require('mongodb').ObjectId;
 //implement jwt token
 const jwt = require('jsonwebtoken');
 
-const { addProducts, createBill, addCompany, addUser, paybill, addShop, totalProduct, payShopBill } = require('./post');
+const { addProducts, createBill, addCompany, addUser, paybill, addShop, totalProduct, payShopBill, PostReturnProduct } = require('./post');
 const { getproducts, getBill, getCompany, getUsers, getShop, getTotalProduct, getbillbyshop } = require('./get');
-const { deleteProduct } = require('./Delete');
-const { getProductsByBarCode, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getemploybille, getProductsByProductNameAndWatt, getBillByDate, getProductByDate, getEmployPaymentByDate, getProductsByPnameComNameWatt, getShopPaymentByDate } = require('./getDataById');
-const { UpdateProduct, UpdateProductbill, UpdateTotalProduct } = require('./Update');
+const { deleteProduct, deleteshop } = require('./Delete');
+const { getProductsByBarCode, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getemploybille, getProductsByProductNameAndWatt, getBillByDate, getProductByDate, getEmployPaymentByDate, getProductsByPnameComNameWatt, getShopPaymentByDate, getProductById, getShopById, getReturnProducts } = require('./getDataById');
+const { UpdateProduct, UpdateProductbill, UpdateTotalProduct, Upadate_Product_Remaining_Balance } = require('./Update');
 
 app.use(cors());
 app.use(express.json());
@@ -21,6 +21,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.send("Hello")
 })
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.7ckpjwn.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
@@ -41,13 +42,18 @@ async function run() {
         const PayCollection = client.db("shahjalal").collection("billpay");
         const TotalProductCollection = client.db("shahjalal").collection("totalproduct");
         const PayShopBillCollection = client.db("shahjalal").collection("payshopbill");
+        const ReturnProductCollection = client.db("shahjalal").collection("ReturnProductCollection");
 
         addCompany(CompanyCollection, app)
         addShop(ShopCollection, app)
         getShop(ShopCollection, app)
+        deleteshop(app, ShopCollection, ObjectId)
         getProductsByProductNameAndWatt(app, ProuductCollection)
         getbillbyshop(PayShopBillCollection, app)
+        getShopById(app, PayShopBillCollection) 
+        Upadate_Product_Remaining_Balance(app, ProuductCollection, ObjectId)
         getShopPaymentByDate(app, PayShopBillCollection)
+        getProductById(app, ObjectId, ProuductCollection)
         getCompany(CompanyCollection, app)
         getProductsByPnameComNameWatt(app, TotalProductCollection)
         totalProduct(TotalProductCollection, app)
@@ -73,6 +79,8 @@ async function run() {
         UpdateProductbill(app, BillCollection, ObjectId)
         UpdateProduct(app, ProuductCollection, ObjectId)
         getBillsById(app, ObjectId, BillCollection)
+        PostReturnProduct(ReturnProductCollection, app)
+        getReturnProducts(app, ReturnProductCollection)
     }
 
     finally { }

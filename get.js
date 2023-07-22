@@ -12,7 +12,7 @@ const getBill = (BillCollection, app) => {
             const result = await BillCollection.find({}).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-            console.log(error);
+            
             res.status(500).send('Error fetching bills');
         }
     })
@@ -24,7 +24,7 @@ const getCompany = (CompanyCollection, app) => {
             const result = await CompanyCollection.find({}).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-            console.log(error);
+           
             res.status(500).send('Error fetching bills');
         }
     })
@@ -36,7 +36,7 @@ const getUsers = (UsersCollection, app) => {
             const result = await UsersCollection.find({}).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-            console.log(error);
+           
             res.status(500).send('Error fetching bills');
         }
     })

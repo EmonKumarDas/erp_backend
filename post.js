@@ -78,6 +78,18 @@ const addCompany = (CompanyCollection, app) => {
     }
   })
 }
+const PostReturnProduct = (ReturnProductCollection, app) => {
+  app.post('/PostReturnProduct', async (req, res) => {
+    try {
+      const ReturnProduct = req.body;
+      const result = await ReturnProductCollection.insertOne(ReturnProduct);
+      res.send(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error inserting company into database');
+    }
+  })
+}
 
 const addUser = (UserCollection, app) => {
   app.post('/addUser', async (req, res) => {
@@ -135,7 +147,7 @@ const payShopBill = (PayShopBillCollection, app) => {
   app.post('/payshopbill', async (req, res) => {
     try {
       const paybill = req.body;
-      console.log(paybill)
+
       const billLower = Object.keys(paybill).reduce((obj, key) => {
         if (typeof paybill[key] === 'string') {
           obj[key.toLowerCase()] = paybill[key].toLowerCase();
@@ -145,10 +157,6 @@ const payShopBill = (PayShopBillCollection, app) => {
         return obj;
       }, {});
 
-      // Add current date to the bill document
-      // const now = new Date();
-      // billLower.date = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-      // billLower.month = `${now.getFullYear()}-${now.getMonth() + 1}`
       const result = await PayShopBillCollection.insertOne(billLower);
       res.send(result);
     } catch (err) {
@@ -161,5 +169,5 @@ const payShopBill = (PayShopBillCollection, app) => {
 
 
 
-module.exports = { addProducts, createBill, addCompany, payShopBill, addUser, paybill, totalProduct, addShop };
+module.exports = { addProducts, createBill, PostReturnProduct, addCompany, payShopBill, addUser, paybill, totalProduct, addShop };
 

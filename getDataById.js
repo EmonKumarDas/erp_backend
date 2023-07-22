@@ -7,6 +7,15 @@ const getProductsByBarCode = (app, ProuductCollection) => {
     })
 }
 
+const getShopById = (app, PayShopBillCollection) => {
+    app.get('/getShopById/:id', async (req, res) => {
+        const shop_id = req.params.id;
+        const shopId = await PayShopBillCollection.find({}).toArray();
+        const result = await shopId.filter(Product => Product.productid == shop_id);
+        res.send(result);
+    })
+}
+
 const getProductsByProductName = (app, ProuductCollection) => {
     app.get('/getProductsByProductName/:name', async (req, res) => {
         const Pname = req.params.name;
@@ -15,6 +24,7 @@ const getProductsByProductName = (app, ProuductCollection) => {
         res.send(result);
     })
 }
+
 
 const getProductsByProductNameAndWatt = (app, ProuductCollection) => {
     app.get('/getProductsByProductNameAndWatt/:name/:watt', async (req, res) => {
@@ -32,7 +42,20 @@ const getBillsById = (app, ObjectId, BillCollection) => {
             const bill = await BillCollection.findOne({ _id: new ObjectId(billId) });
             res.send(bill);
         } catch (error) {
-            console.log(error);
+
+            res.status(500).send('Error retrieving bill by id');
+        }
+    });
+};
+
+const getProductById = (app, ObjectId, ProductCollection) => {
+    app.get('/getProductById/:id', async (req, res) => {
+        const productId = req.params.id;
+        try {
+            const bill = await ProductCollection.findOne({ _id: new ObjectId(productId) });
+            res.send(bill);
+        } catch (error) {
+
             res.status(500).send('Error retrieving bill by id');
         }
     });
@@ -54,7 +77,6 @@ const getEmployee = (PayCollection, app) => {
             const documents = await PayCollection.find(query).toArray();
             res.send(documents);
         } catch (err) {
-            console.error(err);
             res.status(500).send("An error occurred while processing your request");
         }
     });
@@ -67,7 +89,7 @@ const getEmployDetails = (app, ObjectId, PayCollection) => {
             const user = await PayCollection.findOne({ _id: new ObjectId(userId) });
             res.send(user);
         } catch (error) {
-            console.log(error);
+
             res.status(500).send('Error retrieving user by id');
         }
     });
@@ -87,6 +109,14 @@ const getBillByDate = (app, BillCollection) => {
         const date = req.params.date;
         const bill = await BillCollection.find({ month: date }).sort({ _id: -1 }).toArray();
         res.send(bill)
+    })
+}
+
+const getReturnProducts = (app, ReturnProductCollection) => {
+    app.get('/getReturnProducts/:date', async (req, res) => {
+        const date = req.params.date;
+        const products = await ReturnProductCollection.find({ month: date }).sort({ _id: -1 }).toArray();
+        res.send(products)
     })
 }
 
@@ -123,4 +153,4 @@ const getProductsByPnameComNameWatt = (app, TotalProductCollection) => {
     })
 }
 
-module.exports = { getProductsByBarCode, getEmployPaymentByDate,getShopPaymentByDate, getProductByDate, getemploybille, getProductsByProductNameAndWatt, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getBillByDate, getProductsByPnameComNameWatt };
+module.exports = { getProductsByBarCode, getReturnProducts, getEmployPaymentByDate, getShopPaymentByDate, getProductByDate, getemploybille, getProductsByProductNameAndWatt, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getBillByDate, getProductsByPnameComNameWatt, getProductById, getShopById };

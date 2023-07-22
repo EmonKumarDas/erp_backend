@@ -1,23 +1,3 @@
-
-// const UpdateProduct = (app, ProductCollection) => {
-//     app.put('/UpdateProduct/:barCode', async (req, res) => {
-//         const barcode = req.params.barCode;
-//         const newQuantity = req.body.quantity; // assuming the quantity will be passed in the request body
-//         try {
-//             const result = await ProductCollection.updateOne({ barcode }, { $set: { quantity: newQuantity } });
-//             if (result.modifiedCount === 1) {
-//                 res.send(`Successfully updated the product with barcode ${barcode}`);
-//             } else {
-//                 res.status(404).send(`Product with barcode ${barcode} not found`);
-//             }
-//         } catch (err) {
-//             console.log(err);
-//             res.status(500).send('Internal server error');
-//         }
-//     });
-// }
-
-
 const UpdateProduct = (app, ProductCollection, ObjectId) => {
     app.put('/UpdateProduct/:id', async (req, res) => {
         const id = req.params.id;
@@ -34,7 +14,31 @@ const UpdateProduct = (app, ProductCollection, ObjectId) => {
                 res.status(404).send(`Product with _id ${id} not found`);
             }
         } catch (err) {
-            console.log(err);
+          
+            res.status(500).send('Internal server error');
+        }
+    });
+};
+
+// ------------------------**************---------------------------------------
+
+const Upadate_Product_Remaining_Balance = (app, ProductCollection, ObjectId) => {
+    app.put('/Upadate_Product_Remaining_Balance/:id', async (req, res) => {
+        const id = req.params.id;
+        const new_balance = req.body.advance;
+
+        try {
+            const result = await ProductCollection.updateOne(
+                { _id: new ObjectId(id) },
+                { $set: { advance: new_balance } }
+            );
+            if (result.modifiedCount === 1) {
+               
+            } else {
+                res.status(404).send(`Product with _id not found`);
+            }
+        } catch (err) {
+        
             res.status(500).send('Internal server error');
         }
     });
@@ -59,7 +63,7 @@ const UpdateProductbill = (app, BillCollection, ObjectId) => {
                 res.status(404).send(`Product with _id ${id} not found`);
             }
         } catch (err) {
-            console.log(err);
+       
             res.status(500).send('Internal server error');
         }
     });
@@ -82,7 +86,7 @@ const UpdateTotalProduct = (app, TotalProductCollection, ObjectId) => {
                 res.status(404).send(`Product with _id ${id} not found`);
             }
         } catch (err) {
-            console.log(err);
+         
             res.status(500).send('Internal server error');
         }
     });
@@ -91,4 +95,4 @@ const UpdateTotalProduct = (app, TotalProductCollection, ObjectId) => {
 // ----------------------------*************************-------------------------
 
 
-module.exports = { UpdateProduct, UpdateProductbill, UpdateTotalProduct };
+module.exports = { UpdateProduct, UpdateProductbill, UpdateTotalProduct, Upadate_Product_Remaining_Balance };
