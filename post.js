@@ -1,5 +1,5 @@
-const addProducts = (ProuductCollection, app) => {
-  app.post('/addProducts', async (req, res) => {
+const addProducts = (ProuductCollection, app, verifyJWT) => {
+  app.post('/addProducts', verifyJWT, async (req, res) => {
     try {
       const category = req.body;
       // Convert all properties of category to lowercase

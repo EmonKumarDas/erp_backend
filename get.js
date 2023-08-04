@@ -1,76 +1,121 @@
-const getproducts = (ProuductCollection, app) => {
-    app.get('/getProducts', async (req, res) => {
-        const result = await ProuductCollection.find({}).sort({ _id: -1 }).toArray(); // sort by _id in descending order
-        res.send(result);
-    })
-}
+const getproducts = (ProuductCollection, app, verifyJWT) => {
+    app.get('/getProducts/:email', async (req, res) => {
+        const userEmail = req.params?.email; // Get the email from the URL parameter
 
+        let query = {}; // Default query to get all products
 
-const getBill = (BillCollection, app) => {
-    app.get('/getBill', async (req, res) => {
+        if (userEmail) {
+            // If userEmail is provided, add the email to the query to filter data based on the email
+            query = { email: userEmail };
+        }
+
         try {
-            const result = await BillCollection.find({}).sort({ _id: -1 }).toArray();
+            const result = await ProuductCollection.find(query).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-            
-            res.status(500).send('Error fetching bills');
         }
-    })
-}
+    });
+};
 
-const getCompany = (CompanyCollection, app) => {
-    app.get('/getCompany', async (req, res) => {
+
+const getBill = (BillCollection, app, verifyJWT) => {
+    app.get('/getBill/:email', async (req, res) => {
+        const userEmail = req.params.email; // Get the email from the URL parameter
+
+        let query = {}; // Default query to get all bills
+
+        if (userEmail) {
+            // If userEmail is provided, add the email to the query to filter data based on the email
+            query = { email: userEmail };
+        }
+
         try {
-            const result = await CompanyCollection.find({}).sort({ _id: -1 }).toArray();
+            const result = await BillCollection.find(query).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-           
-            res.status(500).send('Error fetching bills');
         }
-    })
-}
+    });
+};
 
-const getUsers = (UsersCollection, app) => {
-    app.get('/getUsers', async (req, res) => {
+const getCompany = (CompanyCollection, app, verifyJWT) => {
+    app.get('/getCompany/:email', verifyJWT, async (req, res) => {
+        const userEmail = req.params.email; // Get the email from the URL parameter
+
+        let query = {}; // Default query to get all companies
+
+        if (userEmail) {
+            // If userEmail is provided, add the email to the query to filter data based on the email
+            query = { email: userEmail };
+        }
+
+        try {
+            const result = await CompanyCollection.find(query).sort({ _id: -1 }).toArray();
+            res.send(result);
+        } catch (error) {
+         
+        }
+    });
+};
+
+
+const getUsers = (UsersCollection, app, verifyJWT) => {
+    app.get('/getUsers', verifyJWT, async (req, res) => {
         try {
             const result = await UsersCollection.find({}).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-           
-            res.status(500).send('Error fetching bills');
+
+            
         }
     })
 }
-const getShop = (ShopCollection, app) => {
-    app.get('/getshop', async (req, res) => {
+
+const getShop = (ShopCollection, app, verifyJWT) => {
+    app.get('/getshop', verifyJWT, async (req, res) => {
         try {
             const result = await ShopCollection.find({}).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-            res.status(500).send('Error fetching bills');
+            
         }
     })
 }
 
-const getTotalProduct = (TotalProductCollection, app) => {
-    app.get('/getTotalProduct', async (req, res) => {
+const getTotalProduct = (TotalProductCollection, app, verifyJWT) => {
+    app.get('/getTotalProduct/:email', verifyJWT, async (req, res) => {
+        const userEmail = req.params.email;
         try {
-            const result = await TotalProductCollection.find({}).sort({ _id: -1 }).toArray();
+            const result = await TotalProductCollection.find({ email: userEmail }).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-            res.status(500).send('Error fetching data');
-        }
-    })
-}
-const getbillbyshop = (PayShopBillCollection, app) => {
-    app.get('/getbillbyshop', async (req, res) => {
-        try {
-            const result = await PayShopBillCollection.find({}).sort({ _id: -1 }).toArray();
-            res.send(result);
-        } catch (error) {
-            res.status(500).send('Error fetching data');
+           
         }
     })
 }
 
-module.exports = { getproducts, getBill, getCompany, getUsers,getbillbyshop, getShop, getTotalProduct };
+
+const getbillbyshop = (PayShopBillCollection, app, verifyJWT) => {
+    app.get('/getbillbyshop/:email', verifyJWT, async (req, res) => {
+        const userEmail = req.params.email;
+        try {
+            const result = await PayShopBillCollection.find({ email: userEmail }).sort({ _id: -1 }).toArray();
+            res.send(result);
+        } catch (error) {
+           
+        }
+    })
+}
+
+const ReturnProduct = (ReturnProductCollection, app, verifyJWT) => {
+    app.get('/ReturnProductCollection/:email', async (req, res) => {
+        const userEmail = req.params.email;
+        try {
+            const result = await ReturnProductCollection.find({ email: userEmail }).sort({ _id: -1 }).toArray();
+            res.send(result);
+        } catch (error) {
+           
+        }
+    })
+}
+
+module.exports = { getproducts, getBill, getCompany, ReturnProduct, getUsers, getbillbyshop, getShop, getTotalProduct };
