@@ -52,20 +52,18 @@ const getCompany = (CompanyCollection, app, verifyJWT) => {
             const result = await CompanyCollection.find(query).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-         
+
         }
     });
 };
 
 
 const getUsers = (UsersCollection, app, verifyJWT) => {
-    app.get('/getUsers', verifyJWT, async (req, res) => {
+    app.get('/getUsers', async (req, res) => {
         try {
             const result = await UsersCollection.find({}).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-
-            
         }
     })
 }
@@ -76,19 +74,19 @@ const getShop = (ShopCollection, app, verifyJWT) => {
             const result = await ShopCollection.find({}).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-            
+
         }
     })
 }
 
 const getTotalProduct = (TotalProductCollection, app, verifyJWT) => {
-    app.get('/getTotalProduct/:email', verifyJWT, async (req, res) => {
+    app.get('/getTotalProduct/:email', async (req, res) => {
         const userEmail = req.params.email;
         try {
             const result = await TotalProductCollection.find({ email: userEmail }).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-           
+
         }
     })
 }
@@ -101,7 +99,7 @@ const getbillbyshop = (PayShopBillCollection, app, verifyJWT) => {
             const result = await PayShopBillCollection.find({ email: userEmail }).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-           
+
         }
     })
 }
@@ -113,9 +111,33 @@ const ReturnProduct = (ReturnProductCollection, app, verifyJWT) => {
             const result = await ReturnProductCollection.find({ email: userEmail }).sort({ _id: -1 }).toArray();
             res.send(result);
         } catch (error) {
-           
+
+        }
+    })
+}
+const getCompanyProducts = (getCompanyProducts, app, verifyJWT) => {
+    app.get('/getCompanyProducts/:email', async (req, res) => {
+        const userEmail = req.params.email;
+        try {
+            const result = await getCompanyProducts.find({ email: userEmail }).sort({ _id: -1 }).toArray();
+            res.send(result);
+        } catch (error) {
+
         }
     })
 }
 
-module.exports = { getproducts, getBill, getCompany, ReturnProduct, getUsers, getbillbyshop, getShop, getTotalProduct };
+const getCompanyProductsCollection = (CompanyProductsCollection, app, verifyJWT) => {
+    app.get('/CompanyProductsCollection/:email', async (req, res) => {
+        const userMail = req.params.email;
+        try {
+            const result = await CompanyProductsCollection.find({ email: userMail }).sort({ _id: -1 }).toArray();
+            res.send(result);
+        }
+        catch (error) {
+
+        }
+    })
+}
+
+module.exports = { getproducts, getBill, getCompanyProducts,getCompanyProductsCollection, getCompany, ReturnProduct, getUsers, getbillbyshop, getShop, getTotalProduct };

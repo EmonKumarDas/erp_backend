@@ -9,8 +9,8 @@ const ObjectId = require('mongodb').ObjectId;
 //implement jwt token
 const jwt = require('jsonwebtoken');
 
-const { addProducts, createBill, addCompany, addUser, paybill, addShop, totalProduct, payShopBill, PostReturnProduct } = require('./post');
-const { getproducts, getBill, getCompany, getUsers, getShop, getTotalProduct, getbillbyshop, ReturnProduct } = require('./get');
+const { addProducts, createBill, addCompany, addUser, paybill, addShop, totalProduct, payShopBill, PostReturnProduct, AddCompanyProducts } = require('./post');
+const { getproducts, getBill, getCompany, getUsers, getShop, getTotalProduct, getbillbyshop, ReturnProduct, getCompanyProducts, getCompanyProductsCollection } = require('./get');
 const { deleteProduct, deleteshop, deleteCompany } = require('./Delete');
 const { getProductsByBarCode, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getemploybille, getProductsByProductNameAndWatt, getBillByDate, getProductByDate, getEmployPaymentByDate, getProductsByPnameComNameWatt, getShopPaymentByDate, getProductById, getShopById, getReturnProducts, getSellByDate } = require('./getDataById');
 const { UpdateProduct, UpdateProductbill, UpdateTotalProduct, Upadate_Product_Remaining_Balance } = require('./Update');
@@ -58,8 +58,9 @@ async function run() {
         const UserCollection = client.db("shahjalal").collection("Users");
         const PayCollection = client.db("shahjalal").collection("billpay");
         const TotalProductCollection = client.db("shahjalal").collection("totalproduct");
-        const PayShopBillCollection  = client.db("shahjalal").collection("payshopbill");
+        const PayShopBillCollection = client.db("shahjalal").collection("payshopbill");
         const ReturnProductCollection = client.db("shahjalal").collection("ReturnProductCollection");
+        const CompanyProductsCollection = client.db("shahjalal").collection("AddCompanyProducts");
 
         // jwt
         app.get('/jwt', async (req, res) => {
@@ -72,9 +73,12 @@ async function run() {
             }
             res.status(403).send({ accessToken: '' })
         });
-        
+
         deleteCompany(app, CompanyCollection, ObjectId, verifyJWT)
         addCompany(CompanyCollection, app, verifyJWT)
+        AddCompanyProducts(CompanyProductsCollection, app, verifyJWT)
+        getCompanyProductsCollection(CompanyProductsCollection, app, verifyJWT) 
+        getCompanyProducts(CompanyProductsCollection, app, verifyJWT)
         addShop(ShopCollection, app, verifyJWT)
         getSellByDate(app, BillCollection, verifyJWT)
         getShop(ShopCollection, app, verifyJWT)
@@ -112,7 +116,7 @@ async function run() {
         getBillsById(app, ObjectId, BillCollection, verifyJWT)
         PostReturnProduct(ReturnProductCollection, app, verifyJWT)
         getReturnProducts(app, ReturnProductCollection, verifyJWT)
-        ReturnProduct(ReturnProductCollection, app, verifyJWT) 
+        ReturnProduct(ReturnProductCollection, app, verifyJWT)
     }
 
     finally { }

@@ -166,8 +166,22 @@ const payShopBill = (PayShopBillCollection, app) => {
   })
 }
 
+const AddCompanyProducts = (AddCompanyProductsCollection, app) => {
+  app.post('/AddCompanyProducts', async (req, res) => {
+    try {
+      const products = req.body;
+      const result = await AddCompanyProductsCollection.insertOne(products);
+      res.send(result);
+    } catch (err) {
+      
+      console.error(err);
+      res.status(500).send('Error inserting bill into database');
+    }
+  })
+}
 
 
 
-module.exports = { addProducts, createBill, PostReturnProduct, addCompany, payShopBill, addUser, paybill, totalProduct, addShop };
+
+module.exports = { addProducts, createBill, AddCompanyProducts, PostReturnProduct, addCompany, payShopBill, addUser, paybill, totalProduct, addShop };
 

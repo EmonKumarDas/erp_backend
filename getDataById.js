@@ -115,9 +115,8 @@ const getBillByDate = (app, BillCollection, verifyJWT) => {
 
 
 const getReturnProducts = (app, ReturnProductCollection, verifyJWT) => {
-    app.get('/getReturnProducts/:date', verifyJWT, async (req, res) => {
-        const date = req.params.date;
-        const products = await ReturnProductCollection.find({ month: date }).sort({ _id: -1 }).toArray();
+    app.get('/getReturnProducts', verifyJWT, async (req, res) => {
+        const products = await ReturnProductCollection.find({}).sort({ _id: -1 }).toArray();
         res.send(products)
     })
 }
