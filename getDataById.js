@@ -25,7 +25,6 @@ const getProductsByProductName = (app, ProuductCollection, verifyJWT) => {
     })
 }
 
-
 const getProductsByProductNameAndWatt = (app, ProuductCollection, verifyJWT) => {
     app.get('/getProductsByProductNameAndWatt/:name/:watt', verifyJWT, async (req, res) => {
         const Pname = req.params.name;
@@ -90,7 +89,7 @@ const getEmployDetails = (app, ObjectId, PayCollection, verifyJWT) => {
             res.send(user);
         } catch (error) {
 
-            
+
         }
     });
 };
@@ -105,7 +104,7 @@ const getemploybille = (app, PayCollection, verifyJWT) => {
 }
 
 const getBillByDate = (app, BillCollection, verifyJWT) => {
-    app.get('/getbillbydate/:email/:date',verifyJWT, async (req, res) => {
+    app.get('/getbillbydate/:email/:date', verifyJWT, async (req, res) => {
         const userEmail = req.params.email;
         const date = req.params.date;
         const bill = await BillCollection.find({ email: userEmail, month: date }).sort({ _id: -1 }).toArray();
@@ -130,38 +129,77 @@ const getSellByDate = (app, BillCollection, verifyJWT) => {
 }
 
 const getProductByDate = (app, ProuductCollection, verifyJWT) => {
-    app.get('/getproductbydate/:date', verifyJWT, async (req, res) => {
+    app.get('/getproductbydate/:email/:date', verifyJWT, async (req, res) => {
         const date = req.params.date;
-        const product = await ProuductCollection.find({ month: date }).sort({ _id: -1 }).toArray();
+        const userEmail = req.params.email;
+        const product = await ProuductCollection.find({ email: userEmail, month: date }).sort({ _id: -1 }).toArray();
         res.send(product)
     })
 }
 
 const getEmployPaymentByDate = (app, PayCollection, verifyJWT) => {
     app.get('/getemploypaymentbydate/:date', verifyJWT, async (req, res) => {
-        const date = req.params.date;
-        const payment = await PayCollection.find({ month: date }).sort({ _id: -1 }).toArray();
-        res.send(payment)
-    })
-}
+        const dateParam = req.params.date;
+        let filter = {};
+
+        if (dateParam.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            // If the provided parameter is in the format "YYYY-MM-DD", use it as a full date filter
+            filter = { "date": dateParam };
+        }
+        else if (dateParam.match(/^\d{4}-\d{2}$/)) {
+            // If the provided parameter is in the format "YYYY-MM", construct a regex to match all dates in that month
+            const yearMonth = dateParam.split('-');
+            const year = yearMonth[0];
+            const month = yearMonth[1];
+            const date = year + "-" + month;
+            filter = {
+                "month": { $regex: date }
+            };
+        }
+        else if (dateParam.match(/^\d{4}/)) {
+            // If the provided parameter is in the format "YYYY", construct a regex to match all dates in that month
+            const yearMonth = dateParam.split('-');
+            const year = yearMonth[0];
+            const date = year;
+            filter = {
+                "year": { $regex: date }
+            };
+        }
+        else {
+            return res.status(400).send("Invalid date format");
+        }
+
+        try {
+            const transactions = await PayCollection.find(filter).toArray();
+            res.send({ transactions });
+        } catch (error) {
+            res.status(500).send("Internal Server Error");
+        }
+    });
+};
 
 const getShopPaymentByDate = (app, PayShopBillCollection, verifyJWT) => {
     app.get('/getShopPaymentByDate/:email/:date', verifyJWT, async (req, res) => {
         const userEmail = req.params.email;
+        const dateParam = req.params.date;
 
-        // Check if userEmail is missing or undefined
-        if (!userEmail) {
-            return res.status(400).send('Email parameter is missing.');
+        let query = { email: userEmail };
+
+        if (dateParam.length === 4) {
+            // Assuming 'dateParam' is a 4-digit year (e.g., '2023')
+            query.date = { $regex: `^${dateParam}-` };
+        } else if (dateParam.length === 7) {
+            // Assuming 'dateParam' is in 'YYYY-MM' format (e.g., '2023-10')
+            query.date = { $regex: `^${dateParam}-` };
+        } else {
+            // Assuming 'dateParam' is in 'YYYY-MM-DD' format (e.g., '2023-10-01')
+            query.date = dateParam;
         }
 
-        const date = req.params.date;
-        const payment = await PayShopBillCollection.find({ userEmail: userEmail, month: date }).sort({ _id: -1 }).toArray();
-
+        const payment = await PayShopBillCollection.find(query).sort({ _id: -1 }).toArray();
         res.send(payment);
     })
 }
-
-
 
 const getProductsByPnameComNameWatt = (app, TotalProductCollection, verifyJWT) => {
     app.get('/getProductsByPnameComNameWatt/:pname/:watt/:cname', verifyJWT, async (req, res) => {
@@ -173,4 +211,55 @@ const getProductsByPnameComNameWatt = (app, TotalProductCollection, verifyJWT) =
     })
 }
 
-module.exports = { getProductsByBarCode, getSellByDate, getReturnProducts, getEmployPaymentByDate, getShopPaymentByDate, getProductByDate, getemploybille, getProductsByProductNameAndWatt, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getBillByDate, getProductsByPnameComNameWatt, getProductById, getShopById };
+const SellProductsByBarCode = (app, CompanyProductsCollection, verifyJWT) => {
+    app.get('/getProductsById/:productId', verifyJWT, async (req, res) => {
+        const productId = req.params.productId;
+        try {
+            const transactions = await CompanyProductsCollection.find({
+                "products.code": productId
+            }).toArray();
+
+            // Find the specific product within the matching transactions
+            let matchingProduct = null;
+            transactions.forEach(transaction => {
+                const product = transaction.products.find(p => p.code === productId);
+                if (product) {
+                    matchingProduct = product;
+                }
+            });
+
+            res.send(matchingProduct);
+        } catch (error) {
+            res.status(500).send("Internal Server Error");
+        }
+    });
+};
+
+const getProductsById = (app, ObjectId, ProductModel, verifyJWT) => {
+    app.get('/ProductsById/:id', verifyJWT, async (req, res) => {
+        const productId = req.params.id;
+
+        try {
+            const product = await ProductModel.findOne({ _id: new ObjectId(productId) });
+            if (!product) {
+            }
+            res.json(product);
+        } catch (error) {
+        }
+    });
+};
+const getBillById = (app, ObjectId, BillProduct, verifyJWT) => {
+    app.get('/getBillById/:id', verifyJWT, async (req, res) => {
+        const productId = req.params.id;
+        try {
+            const product = await BillProduct.findOne({ _id: new ObjectId(productId) });
+            if (!product) {
+            }
+            res.json(product);
+        } catch (error) {
+        }
+    });
+};
+
+
+module.exports = { getProductsByBarCode, getBillById, getProductsById, SellProductsByBarCode, getSellByDate, getReturnProducts, getEmployPaymentByDate, getShopPaymentByDate, getProductByDate, getemploybille, getProductsByProductNameAndWatt, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getBillByDate, getProductsByPnameComNameWatt, getProductById, getShopById };

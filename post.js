@@ -20,8 +20,8 @@ const addProducts = (ProuductCollection, app, verifyJWT) => {
   });
 };
 // --------------********** add Product **************------------------------
-const totalProduct = (ProuductCollection, app) => {
-  app.post('/totalProduct', async (req, res) => {
+const totalProduct = (ProuductCollection, app, verifyJWT) => {
+  app.post('/totalProduct', verifyJWT, async (req, res) => {
     try {
       const category = req.body;
       // Convert all properties of category to lowercase
@@ -39,35 +39,31 @@ const totalProduct = (ProuductCollection, app) => {
 };
 
 
-const createBill = (BillCollection, app) => {
-  app.post('/createBill', async (req, res) => {
+const createBill = (BillCollection, app, verifyJWT) => {
+  app.post('/createBill', verifyJWT, async (req, res) => {
     try {
       const bill = req.body;
       const billLower = Object.keys(bill).reduce((obj, key) => {
         if (typeof bill[key] === 'string') {
           obj[key.toLowerCase()] = bill[key].toLowerCase();
-        } else {
+        }
+        else {
           obj[key.toLowerCase()] = bill[key];
         }
         return obj;
       }, {});
 
-      // Add current date to the bill document
-      const now = new Date();
-      billLower.date = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-      billLower.month = `${now.getFullYear()}-${now.getMonth() + 1}`;
-
       const result = await BillCollection.insertOne(billLower);
       res.send(result);
     } catch (err) {
       console.error(err);
-      res.status(500).send('Error inserting bill into database');
     }
   });
 };
 
-const addCompany = (CompanyCollection, app) => {
-  app.post('/addcompany', async (req, res) => {
+
+const addCompany = (CompanyCollection, app, verifyJWT) => {
+  app.post('/addcompany', verifyJWT, async (req, res) => {
     try {
       const company = req.body;
       const result = await CompanyCollection.insertOne(company);
@@ -78,8 +74,8 @@ const addCompany = (CompanyCollection, app) => {
     }
   })
 }
-const PostReturnProduct = (ReturnProductCollection, app) => {
-  app.post('/PostReturnProduct', async (req, res) => {
+const PostReturnProduct = (ReturnProductCollection, app, verifyJWT) => {
+  app.post('/PostReturnProduct', verifyJWT, async (req, res) => {
     try {
       const ReturnProduct = req.body;
       const result = await ReturnProductCollection.insertOne(ReturnProduct);
@@ -91,8 +87,8 @@ const PostReturnProduct = (ReturnProductCollection, app) => {
   })
 }
 
-const addUser = (UserCollection, app) => {
-  app.post('/addUser', async (req, res) => {
+const addUser = (UserCollection, app, verifyJWT) => {
+  app.post('/addUser', verifyJWT, async (req, res) => {
     try {
       const user = req.body;
       const result = await UserCollection.insertOne(user);
@@ -104,8 +100,8 @@ const addUser = (UserCollection, app) => {
   })
 }
 
-const addShop = (ShopCollection, app) => {
-  app.post('/addshop', async (req, res) => {
+const addShop = (ShopCollection, app, verifyJWT) => {
+  app.post('/addshop', verifyJWT, async (req, res) => {
     try {
       const shop = req.body;
       const result = await ShopCollection.insertOne(shop);
@@ -117,24 +113,11 @@ const addShop = (ShopCollection, app) => {
   })
 }
 
-const paybill = (PayCollection, app) => {
-  app.post('/paybill', async (req, res) => {
+const paybill = (PayCollection, app, verifyJWT) => {
+  app.post('/paybill', verifyJWT, async (req, res) => {
     try {
       const paybill = req.body;
-      const billLower = Object.keys(paybill).reduce((obj, key) => {
-        if (typeof paybill[key] === 'string') {
-          obj[key.toLowerCase()] = paybill[key].toLowerCase();
-        } else {
-          obj[key.toLowerCase()] = paybill[key];
-        }
-        return obj;
-      }, {});
-
-      // Add current date to the bill document
-      const now = new Date();
-      billLower.date = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-      billLower.month = `${now.getFullYear()}-${now.getMonth() + 1}`
-      const result = await PayCollection.insertOne(billLower);
+      const result = await PayCollection.insertOne(paybill);
       res.send(result);
     } catch (err) {
       console.error(err);
@@ -143,8 +126,8 @@ const paybill = (PayCollection, app) => {
   })
 }
 
-const payShopBill = (PayShopBillCollection, app) => {
-  app.post('/payshopbill', async (req, res) => {
+const payShopBill = (PayShopBillCollection, app, verifyJWT) => {
+  app.post('/payshopbill', verifyJWT, async (req, res) => {
     try {
       const paybill = req.body;
 
@@ -166,14 +149,14 @@ const payShopBill = (PayShopBillCollection, app) => {
   })
 }
 
-const AddCompanyProducts = (AddCompanyProductsCollection, app) => {
-  app.post('/AddCompanyProducts', async (req, res) => {
+const AddCompanyProducts = (AddCompanyProductsCollection, app, verifyJWT) => {
+  app.post('/AddCompanyProducts', verifyJWT, async (req, res) => {
     try {
       const products = req.body;
       const result = await AddCompanyProductsCollection.insertOne(products);
       res.send(result);
     } catch (err) {
-      
+
       console.error(err);
       res.status(500).send('Error inserting bill into database');
     }

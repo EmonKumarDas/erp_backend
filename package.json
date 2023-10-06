@@ -17,6 +17,7 @@
     "module": "^1.2.5",
     "mongodb": "^5.1.0",
     "mongoose": "^7.4.0",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "twilio": "^4.16.0"
   }
 }

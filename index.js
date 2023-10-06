@@ -5,19 +5,29 @@ const cors = require('cors');
 const port = 5000;
 require('dotenv').config();
 const ObjectId = require('mongodb').ObjectId;
-
+const twilio = require('twilio');
 //implement jwt token
 const jwt = require('jsonwebtoken');
 
+// Twilio credentials
+const accountSid = process.env.accountSid;
+const authToken = process.env.authToken;
+const twilioClient = twilio(accountSid, authToken);
+
 const { addProducts, createBill, addCompany, addUser, paybill, addShop, totalProduct, payShopBill, PostReturnProduct, AddCompanyProducts } = require('./post');
-const { getproducts, getBill, getCompany, getUsers, getShop, getTotalProduct, getbillbyshop, ReturnProduct, getCompanyProducts, getCompanyProductsCollection } = require('./get');
+const { getproducts, getBill, getCompany, getUsers, getShop, getTotalProduct, getbillbyshop, ReturnProduct, getCompanyProducts, getCompanyProductsCollection, getProductsByDate, getTotallSellByDate, getCodeCollection, getStoreProductDate } = require('./get');
 const { deleteProduct, deleteshop, deleteCompany } = require('./Delete');
-const { getProductsByBarCode, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getemploybille, getProductsByProductNameAndWatt, getBillByDate, getProductByDate, getEmployPaymentByDate, getProductsByPnameComNameWatt, getShopPaymentByDate, getProductById, getShopById, getReturnProducts, getSellByDate } = require('./getDataById');
+const { getProductsByBarCode, getBillsById, getProductsByProductName, getEmployee, getEmployDetails, getemploybille, getProductsByProductNameAndWatt, getBillByDate, getProductByDate, getEmployPaymentByDate, getProductsByPnameComNameWatt, getShopPaymentByDate, getProductById, getShopById, getReturnProducts, getSellByDate, SellProductsByBarCode, getProductsById, getBillById } = require('./getDataById');
 const { UpdateProduct, UpdateProductbill, UpdateTotalProduct, Upadate_Product_Remaining_Balance } = require('./Update');
 
 app.use(cors());
 app.use(express.json());
-
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+  
 app.get('/', (req, res) => {
     res.send("Hello")
 })
@@ -53,6 +63,7 @@ async function run() {
     try {
         const ProuductCollection = client.db("shahjalal").collection("product");
         const ShopCollection = client.db("shahjalal").collection("shop");
+        const CodeCollection = client.db("shahjalal").collection("code");
         const BillCollection = client.db("shahjalal").collection("CreateBill");
         const CompanyCollection = client.db("shahjalal").collection("Company");
         const UserCollection = client.db("shahjalal").collection("Users");
@@ -74,10 +85,36 @@ async function run() {
             res.status(403).send({ accessToken: '' })
         });
 
+        app.post('/send-sms', (req, res) => {
+            const { to, body } = req.body;
+
+            twilioClient.messages
+                .create({
+                    to,
+                    from: '+14327772745',
+                    body,
+                })
+                .then(message => {
+                    console.log(`Message sent with SID: ${message.sid}`);
+                    res.json({ success: true });
+                })
+                .catch(error => {
+                    console.error(`Error sending message: ${error.message}`);
+                    res.status(500).json({ success: false, error: error.message });
+                });
+        });
+
         deleteCompany(app, CompanyCollection, ObjectId, verifyJWT)
         addCompany(CompanyCollection, app, verifyJWT)
+        SellProductsByBarCode(app, CompanyProductsCollection, verifyJWT)
+        getTotallSellByDate(BillCollection, app, verifyJWT)
+        getStoreProductDate(BillCollection, app, verifyJWT) 
+        getCodeCollection(CodeCollection, app, verifyJWT)
+        getProductsById(app, ObjectId, CompanyProductsCollection, verifyJWT)
+        getBillById(app, ObjectId, BillCollection, verifyJWT)
+        getProductsByDate(CompanyProductsCollection, app, verifyJWT)
         AddCompanyProducts(CompanyProductsCollection, app, verifyJWT)
-        getCompanyProductsCollection(CompanyProductsCollection, app, verifyJWT) 
+        getCompanyProductsCollection(CompanyProductsCollection, app, verifyJWT)
         getCompanyProducts(CompanyProductsCollection, app, verifyJWT)
         addShop(ShopCollection, app, verifyJWT)
         getSellByDate(app, BillCollection, verifyJWT)
@@ -86,9 +123,9 @@ async function run() {
         getProductsByProductNameAndWatt(app, ProuductCollection, verifyJWT)
         getbillbyshop(PayShopBillCollection, app, verifyJWT)
         getShopById(app, PayShopBillCollection, verifyJWT)
-        Upadate_Product_Remaining_Balance(app, ProuductCollection, ObjectId, verifyJWT)
+        Upadate_Product_Remaining_Balance(app, CompanyProductsCollection, ObjectId, verifyJWT)
         getShopPaymentByDate(app, PayShopBillCollection, verifyJWT)
-        getProductById(app, ObjectId, ProuductCollection, verifyJWT)
+        getProductById(app, ObjectId, CompanyProductsCollection, verifyJWT)
         getCompany(CompanyCollection, app, verifyJWT)
         getProductsByPnameComNameWatt(app, TotalProductCollection, verifyJWT)
         totalProduct(TotalProductCollection, app, verifyJWT)
@@ -103,10 +140,10 @@ async function run() {
         getemploybille(app, PayCollection, verifyJWT)
         getEmployee(PayCollection, app, verifyJWT)
         addProducts(ProuductCollection, app, verifyJWT)
-        getproducts(ProuductCollection, app, verifyJWT)
-        getProductByDate(app, ProuductCollection, verifyJWT)
+        getproducts(CompanyProductsCollection, app, verifyJWT)
+        getProductByDate(app, CompanyProductsCollection, verifyJWT)
         getProductsByProductName(app, ProuductCollection, verifyJWT)
-        deleteProduct(app, ProuductCollection, ObjectId, verifyJWT)
+        deleteProduct(app, CompanyProductsCollection, ObjectId, verifyJWT)
         getProductsByBarCode(app, ProuductCollection, verifyJWT)
         createBill(BillCollection, app, verifyJWT)
         getBill(BillCollection, app, verifyJWT)
